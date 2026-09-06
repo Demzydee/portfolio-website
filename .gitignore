@@ -10,3 +10,11 @@ coverage/
 public/models/*.tmp
 public/models/*.bak
 # Keep models intentionally, but consider removing large intermediates locally before pushing
+
+# Ignore intermediate/working GLB files
+public/models/*resize*.glb
+public/models/*resized*.glb
+public/models/*weld*.glb
+public/models/*simp*.glb
+public/models/*draco*.glb
+public/models/realistic-head.glb
