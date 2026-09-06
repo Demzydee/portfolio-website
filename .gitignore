@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env
+.DS_Store
+.vite/
+.cache/
+coverage/
+/.idea/
+.history/
+public/models/*.tmp
+public/models/*.bak
+# Keep models intentionally, but consider removing large intermediates locally before pushing
