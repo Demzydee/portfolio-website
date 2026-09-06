@@ -1,4 +1,4 @@
-# Jack — 3D Creator Portfolio
+# Vicki — 3D Creator Portfolio
 
 ## Setup
 
