@@ -1,0 +1,236 @@
+import { useEffect, useRef } from 'react';
+
+export default function ModelViewer() {
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    // Lazy-init and responsive model handling
+    let raf = 0;
+    let targetYaw = 0;
+    let currentYaw = 0;
+    let targetPhi = 0;
+    let currentPhi = 0;
+    let inactivityTimer: number | null = null;
+    let initCleanup: (() => void) | null = null;
+
+    const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function chooseModelSrc() {
+      try {
+        const nav: any = navigator as any;
+        const saveData = nav.connection && nav.connection.saveData;
+        const effective = nav.connection && nav.connection.effectiveType;
+        const w = window.innerWidth || document.documentElement.clientWidth;
+        if (saveData || effective === '2g' || effective === 'slow-2g') return '/models/realistic-head-opt.glb';
+        if (w <= 420) return '/models/realistic-head-opt.glb';
+        if (w <= 1024) return '/models/realistic-head-mid.glb';
+        return '/models/realistic-head-mid.glb';
+      } catch (err) {
+        return '/models/realistic-head-mid.glb';
+      }
+    }
+
+    function createModelElement() {
+      // avoid creating a second model if one already exists
+      if (ref.current && ref.current.querySelector && ref.current.querySelector('model-viewer')) return;
+      const m = document.createElement('model-viewer');
+      m.setAttribute('src', chooseModelSrc());
+      m.setAttribute('alt', 'Vicki realistic head portrait');
+      m.setAttribute('loading', 'lazy');
+      m.setAttribute('reveal', 'auto');
+      m.setAttribute('shadow-intensity', '0.0');
+      m.style.background = 'transparent';
+      m.style.width = 'min(46vw, 640px)';
+      m.style.height = 'min(46vw, 640px)';
+      m.style.maxWidth = '100%';
+      m.style.maxHeight = '100%';
+      m.style.display = 'block';
+      m.style.margin = '0';
+      m.style.boxSizing = 'border-box';
+      m.style.pointerEvents = 'auto';
+      m.style.cursor = 'default';
+
+      const stopClick = (ev: Event) => {
+        ev.stopPropagation();
+        ev.preventDefault();
+      };
+      m.addEventListener('pointerdown', stopClick);
+      m.addEventListener('click', stopClick);
+
+      m.removeAttribute('auto-rotate');
+
+      const DEFAULT_YAW = -14;
+      const DEFAULT_PHI = 75;
+      const INACTIVITY_MS = 5000;
+      let MAX_SWIVEL = 45;
+      let MAX_TILT = 45;
+
+      if (window.innerWidth <= 420) {
+        MAX_SWIVEL = 30;
+        MAX_TILT = 25;
+      } else if (window.innerWidth <= 768) {
+        MAX_SWIVEL = 35;
+        MAX_TILT = 30;
+      }
+
+      function resetInactivity() {
+        if (inactivityTimer) clearTimeout(inactivityTimer);
+        inactivityTimer = window.setTimeout(() => {
+          targetYaw = DEFAULT_YAW;
+          targetPhi = DEFAULT_PHI;
+        }, INACTIVITY_MS);
+      }
+
+      function onDoubleClick() {
+        targetYaw = DEFAULT_YAW;
+        targetPhi = DEFAULT_PHI;
+        if (inactivityTimer) {
+          clearTimeout(inactivityTimer);
+          inactivityTimer = null;
+        }
+      }
+
+      function onPointerMove(e: PointerEvent) {
+        const hero = ref.current ? (ref.current.closest('section') as HTMLElement | null) : null;
+        const rect = hero ? hero.getBoundingClientRect() : (ref.current as HTMLElement).getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const w = rect.width || window.innerWidth || document.documentElement.clientWidth;
+        const h = rect.height || window.innerHeight || document.documentElement.clientHeight;
+        const nx = (x / w - 0.5) * 2;
+        const ny = (y / h - 0.5) * 2;
+        targetYaw = DEFAULT_YAW - nx * MAX_SWIVEL;
+        targetPhi = DEFAULT_PHI - ny * MAX_TILT;
+        if (targetPhi < 10) targetPhi = 10;
+        if (targetPhi > 170) targetPhi = 170;
+        // touch smoothing
+        if ((e as any).pointerType === 'touch') {
+          currentYaw += (targetYaw - currentYaw) * 0.08;
+          currentPhi += (targetPhi - currentPhi) * 0.08;
+        }
+        resetInactivity();
+      }
+
+      function animate() {
+        if (prefersReduced) {
+          try {
+            m.setAttribute('camera-orbit', `${DEFAULT_YAW}deg ${DEFAULT_PHI}deg 2.2m`);
+          } catch (err) {}
+          return;
+        }
+        const returningToDefault = Math.abs(targetYaw - DEFAULT_YAW) < 0.001 && Math.abs(targetPhi - DEFAULT_PHI) < 0.001;
+        const speed = returningToDefault ? 0.06 : 0.12;
+        currentYaw += (targetYaw - currentYaw) * speed;
+        currentPhi += (targetPhi - currentPhi) * speed;
+        const radius = 2.2;
+        try {
+          m.setAttribute('camera-orbit', `${currentYaw.toFixed(2)}deg ${currentPhi.toFixed(2)}deg ${radius}m`);
+        } catch (err) {}
+        raf = requestAnimationFrame(animate);
+      }
+
+      if (ref.current) ref.current.appendChild(m);
+
+      function setInitialOrbit() {
+        try {
+          m.setAttribute('camera-orbit', `${DEFAULT_YAW}deg ${DEFAULT_PHI}deg 2.2m`);
+        } catch (err) {}
+        currentYaw = DEFAULT_YAW;
+        targetYaw = DEFAULT_YAW;
+        currentPhi = DEFAULT_PHI;
+        targetPhi = DEFAULT_PHI;
+      }
+
+      m.addEventListener('load', setInitialOrbit, { once: true } as AddEventListenerOptions);
+
+      const container = ref.current as HTMLElement | null;
+      const hero = container ? (container.closest('section') as HTMLElement | null) : null;
+      const listenTarget: EventTarget = (hero || container || window) as unknown as EventTarget;
+
+      (listenTarget as HTMLElement).addEventListener('pointermove', onPointerMove as EventListener);
+      (listenTarget as HTMLElement).addEventListener('pointerleave', () => {
+        resetInactivity();
+      });
+      (listenTarget as HTMLElement).addEventListener('dblclick', onDoubleClick as EventListener);
+
+      setInitialOrbit();
+
+      raf = requestAnimationFrame(animate);
+
+      // auto-look-down: tie pitch to scroll progress past the hero
+      let removeScroll: (() => void) | null = null;
+      try {
+        const heroEl = ref.current ? (ref.current.closest('section') as HTMLElement | null) : null;
+        const LOOK_DOWN_OFFSET = window.innerWidth <= 420 ? 20 : 12; // degrees to add when fully scrolled
+        if (heroEl) {
+          let ticking = false;
+          function handleScroll() {
+            if (prefersReduced) return;
+            if (!ticking) {
+              window.requestAnimationFrame(() => {
+                const rect = (heroEl as HTMLElement).getBoundingClientRect();
+                // progress: 0 when hero fully in view, increases as it scrolls up (out of view)
+                const progress = Math.min(1, Math.max(0, -rect.top / (rect.height || window.innerHeight)));
+                targetPhi = DEFAULT_PHI + progress * LOOK_DOWN_OFFSET;
+                resetInactivity();
+                ticking = false;
+              });
+              ticking = true;
+            }
+          }
+          window.addEventListener('scroll', handleScroll, { passive: true });
+          // initialize
+          handleScroll();
+          removeScroll = () => window.removeEventListener('scroll', handleScroll);
+        }
+      } catch (err) {
+        /* ignore */
+      }
+
+      initCleanup = () => {
+        if (container) {
+          container.removeEventListener('pointermove', onPointerMove as EventListener);
+          container.removeEventListener('pointerleave', () => {});
+          container.removeEventListener('dblclick', onDoubleClick as EventListener);
+        }
+        m.removeEventListener('pointerdown', stopClick as EventListener);
+        m.removeEventListener('click', stopClick as EventListener);
+        cancelAnimationFrame(raf);
+        if (ref.current && m.parentElement === ref.current) ref.current.removeChild(m);
+        if (removeScroll) {
+          try { removeScroll(); } catch (err) {}
+          removeScroll = null;
+        }
+      };
+    }
+
+    let observer: IntersectionObserver | null = null;
+    if ('IntersectionObserver' in window) {
+      observer = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            createModelElement();
+            if (observer) {
+              observer.disconnect();
+              observer = null;
+            }
+            break;
+          }
+        }
+      }, { root: null, rootMargin: '300px', threshold: 0.01 });
+      if (ref.current) observer.observe(ref.current);
+    } else {
+      createModelElement();
+    }
+
+    return () => {
+      if (observer) {
+        observer.disconnect();
+        observer = null;
+      }
+      if (initCleanup) initCleanup();
+    };
+  }, []);
+
+  return <div ref={ref} />;
+}
