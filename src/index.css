@@ -40,7 +40,7 @@ body,
 }
 
 body {
-  font-family: 'Kanit', sans-serif;
+  font-family: 'Figtree', 'Geist', 'Kanit', sans-serif;
   background:
     radial-gradient(circle at top, rgba(182, 0, 168, 0.18), transparent 35%),
     var(--color-bg);
@@ -49,6 +49,88 @@ body {
 img {
   max-width: 100%;
   display: block;
+}
+
+.preloader-shell {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at top, rgba(182, 0, 168, 0.18), transparent 32%),
+    linear-gradient(180deg, #0c0c0c 0%, #0f1218 100%);
+  transition: opacity 0.55s ease, visibility 0.55s ease;
+}
+
+.preloader-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.preloader-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.preloader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+}
+
+.preloader-word {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.02em;
+  min-height: 5rem;
+}
+
+.preloader-letter {
+  display: inline-block;
+  font-size: clamp(4.6875rem, 12.5vw, 9.375rem);
+  font-weight: 900;
+  letter-spacing: -0.09em;
+  line-height: 0.9;
+  background: linear-gradient(180deg, #646973 0%, #d7e2ea 45%, #f2f7fb 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  transform-origin: center center;
+}
+
+.preloader-progress-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 137.5px;
+  min-height: 2.375rem;
+}
+
+.preloader-progress-value {
+  font-size: 1.171875rem;
+  font-weight: 600;
+  letter-spacing: 0.2rem;
+  text-transform: uppercase;
+  color: rgba(215, 226, 234, 0.9);
+}
+
+.site-shell {
+  opacity: 1;
+  transition: opacity 0.55s ease;
+}
+
+.site-shell-hidden {
+  opacity: 0;
+}
+
+.site-shell-ready {
+  opacity: 1;
 }
 
 .marquee-shell {
