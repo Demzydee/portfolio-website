@@ -49,7 +49,14 @@ export default function ModelViewer() {
       m.style.maxHeight = '100%';
       m.style.display = 'block';
       m.style.margin = '0';
-      m.style.boxSizing = 'border-box';
+      m.style.padding = '0';
+      m.style.border = 'none';
+      m.style.outline = 'none';
+      m.style.borderRadius = '0';
+      m.style.boxSizing = 'content-box';
+      m.style.boxShadow = 'none';
+      m.style.filter = 'none';
+      m.style.overflow = 'visible';
       m.style.pointerEvents = 'auto';
       m.style.cursor = 'default';
 

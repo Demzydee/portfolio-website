@@ -12,14 +12,14 @@ export default function HeroSection() {
         delay={0}
         y={-20}
         as="nav"
-        className="flex items-center justify-between px-6 md:px-10 pt-6 md:pt-8"
+        className="relative z-50 flex items-center justify-between px-6 md:px-10 pt-6 md:pt-8"
       >
         <div className="w-full max-w-6xl mx-auto flex items-center justify-between">
           {NAV_LINKS.map((link) => (
             <a
               key={link}
               href={`#${link.toLowerCase()}`}
-              className="text-[#D7E2EA] font-medium uppercase tracking-wider text-sm md:text-lg lg:text-[1.4rem] hover:opacity-70 transition-opacity duration-200"
+              className="relative z-50 text-[#D7E2EA] font-medium uppercase tracking-wider text-sm md:text-lg lg:text-[1.4rem] hover:opacity-70 transition-opacity duration-200"
             >
               {link}
             </a>
@@ -27,8 +27,8 @@ export default function HeroSection() {
         </div>
       </FadeIn>
 
-      <FadeIn delay={0.15} y={40} className="overflow-visible mt-6 sm:mt-4 md:-mt-5 px-6 md:px-10">
-        <div className="w-full max-w-6xl mx-auto relative z-20 text-center">
+      <FadeIn delay={0.15} y={40} className="relative z-10 overflow-hidden mt-6 sm:mt-4 md:-mt-5 px-6 md:px-10">
+        <div className="w-full max-w-6xl mx-auto text-center relative z-10 overflow-hidden">
           <DancingLetters
             text="Hi, I'm Vicki."
             className="justify-center"

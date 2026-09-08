@@ -58,6 +58,10 @@ export default function MarqueeSection() {
               preload="metadata"
               aria-label={tile.label}
               className="marquee-video"
+              onError={(event) => {
+                const video = event.currentTarget;
+                video.style.display = 'none';
+              }}
             />
           ))}
         </div>
@@ -75,6 +79,10 @@ export default function MarqueeSection() {
               preload="metadata"
               aria-label={tile.label}
               className="marquee-video"
+              onError={(event) => {
+                const video = event.currentTarget;
+                video.style.display = 'none';
+              }}
             />
           ))}
         </div>
