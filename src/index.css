@@ -51,6 +51,28 @@ img {
   display: block;
 }
 
+.marquee-shell {
+  width: 100%;
+  overflow: hidden;
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 12px;
+  will-change: transform;
+  transition: transform 0.12s linear;
+}
+
+.marquee-video {
+  width: min(32vw, 420px);
+  height: min(20vw, 270px);
+  object-fit: cover;
+  border-radius: 1rem;
+  flex-shrink: 0;
+  background: #0c0c0c;
+}
+
 a {
   text-decoration: none;
 }

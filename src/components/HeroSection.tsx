@@ -1,6 +1,7 @@
 import FadeIn from './FadeIn';
 import ContactButton from './ContactButton';
 import ModelViewer from './ModelViewer';
+import DancingLetters from './ui/dancing-letters';
 
 const NAV_LINKS = ['About', 'Price', 'Projects', 'Contact'];
 
@@ -28,9 +29,11 @@ export default function HeroSection() {
 
       <FadeIn delay={0.15} y={40} className="overflow-visible mt-6 sm:mt-4 md:-mt-5 px-6 md:px-10">
         <div className="w-full max-w-6xl mx-auto relative z-20 text-center">
-          <h1 className="hero-heading font-black uppercase tracking-tight leading-none whitespace-nowrap w-full text-[14vw] sm:text-[15vw] md:text-[16vw] lg:text-[17.5vw]">
-            Hi, I'm Vicki
-          </h1>
+          <DancingLetters
+            text="Hi, I'm Vicki."
+            className="justify-center"
+            letterClassName="normal-case tracking-[-0.06em] text-[14vw] sm:text-[15vw] md:text-[16vw] lg:text-[17.5vw]"
+          />
         </div>
       </FadeIn>
 

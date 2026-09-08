@@ -10,6 +10,9 @@ export default function ModelViewer() {
     let currentYaw = 0;
     let targetPhi = 0;
     let currentPhi = 0;
+    let pointerYawOffset = 0;
+    let pointerPitchOffset = 0;
+    let scrollPitchOffset = 0;
     let inactivityTimer: number | null = null;
     let initCleanup: (() => void) | null = null;
 
@@ -73,17 +76,26 @@ export default function ModelViewer() {
         MAX_TILT = 30;
       }
 
+      function syncTargetOrientation() {
+        targetYaw = DEFAULT_YAW + pointerYawOffset;
+        targetPhi = DEFAULT_PHI + scrollPitchOffset + pointerPitchOffset;
+        if (targetPhi < 10) targetPhi = 10;
+        if (targetPhi > 170) targetPhi = 170;
+      }
+
       function resetInactivity() {
         if (inactivityTimer) clearTimeout(inactivityTimer);
         inactivityTimer = window.setTimeout(() => {
-          targetYaw = DEFAULT_YAW;
-          targetPhi = DEFAULT_PHI;
+          pointerYawOffset = 0;
+          pointerPitchOffset = 0;
+          syncTargetOrientation();
         }, INACTIVITY_MS);
       }
 
       function onDoubleClick() {
-        targetYaw = DEFAULT_YAW;
-        targetPhi = DEFAULT_PHI;
+        pointerYawOffset = 0;
+        pointerPitchOffset = 0;
+        syncTargetOrientation();
         if (inactivityTimer) {
           clearTimeout(inactivityTimer);
           inactivityTimer = null;
@@ -99,10 +111,9 @@ export default function ModelViewer() {
         const h = rect.height || window.innerHeight || document.documentElement.clientHeight;
         const nx = (x / w - 0.5) * 2;
         const ny = (y / h - 0.5) * 2;
-        targetYaw = DEFAULT_YAW - nx * MAX_SWIVEL;
-        targetPhi = DEFAULT_PHI - ny * MAX_TILT;
-        if (targetPhi < 10) targetPhi = 10;
-        if (targetPhi > 170) targetPhi = 170;
+        pointerYawOffset = -nx * MAX_SWIVEL;
+        pointerPitchOffset = -ny * MAX_TILT;
+        syncTargetOrientation();
         // touch smoothing
         if ((e as any).pointerType === 'touch') {
           currentYaw += (targetYaw - currentYaw) * 0.08;
@@ -149,6 +160,9 @@ export default function ModelViewer() {
 
       (listenTarget as HTMLElement).addEventListener('pointermove', onPointerMove as EventListener);
       (listenTarget as HTMLElement).addEventListener('pointerleave', () => {
+        pointerYawOffset = 0;
+        pointerPitchOffset = 0;
+        syncTargetOrientation();
         resetInactivity();
       });
       (listenTarget as HTMLElement).addEventListener('dblclick', onDoubleClick as EventListener);
@@ -168,10 +182,22 @@ export default function ModelViewer() {
             if (prefersReduced) return;
             if (!ticking) {
               window.requestAnimationFrame(() => {
-                const rect = (heroEl as HTMLElement).getBoundingClientRect();
-                // progress: 0 when hero fully in view, increases as it scrolls up (out of view)
-                const progress = Math.min(1, Math.max(0, -rect.top / (rect.height || window.innerHeight)));
-                targetPhi = DEFAULT_PHI + progress * LOOK_DOWN_OFFSET;
+                if (!heroEl) return;
+
+                const heroRect = heroEl.getBoundingClientRect();
+                const heroTop = heroEl.offsetTop || 0;
+                const heroHeight = heroEl.offsetHeight || window.innerHeight;
+                const scrollProgress = Math.min(
+                  1,
+                  Math.max(0, (window.scrollY - heroTop) / (heroHeight * 0.8))
+                );
+                const viewportProgress = Math.min(
+                  1,
+                  Math.max(0, (window.innerHeight - heroRect.top) / (window.innerHeight * 0.9))
+                );
+                const progress = Math.min(scrollProgress, viewportProgress);
+                scrollPitchOffset = progress * LOOK_DOWN_OFFSET;
+                syncTargetOrientation();
                 resetInactivity();
                 ticking = false;
               });

@@ -10,10 +10,12 @@ interface Project {
 }
 
 const workVideos = [
+  '/videos/work1.mp4',
   '/videos/global_gateway_communication.mp4',
   '/videos/nietzsche_sustainibilty.mp4',
 ];
 
+const fallbackVideo = '/videos/global_gateway_communication.mp4';
 const uploadedVideo = '/videos/work-3-uploaded.mp4';
 const uploadedImage = '/projects/work-4-speedtest.png';
 
@@ -102,6 +104,12 @@ function ProjectCard({
           {project.images[2].endsWith('.mp4') ? (
             <video
               src={project.images[2]}
+              onError={(event) => {
+                const video = event.currentTarget;
+                if (video.src !== window.location.origin + fallbackVideo) {
+                  video.src = fallbackVideo;
+                }
+              }}
               className="w-full h-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-contain bg-[#0C0C0C]"
               muted
               loop

@@ -1,80 +1,80 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 
 const videoSources = [
-  '/videos/global_gateway_communication.mp4',
-  '/videos/nietzsche_sustainibilty.mp4',
+  '/videos/work1.mp4',
+  '/videos/work2.mp4',
+  '/videos/work3.mp4',
 ];
 
 function buildTiles(count: number) {
-  const repeated = [...Array(count)].map((_, index) => ({
+  const tiles = Array.from({ length: count }, (_, index) => ({
     id: `work-${index}`,
     src: videoSources[index % videoSources.length],
     label: `Work ${index + 1}`,
   }));
 
-  return [...repeated, ...repeated, ...repeated];
+  return [...tiles, ...tiles];
 }
 
-const row1Tiles = buildTiles(11);
-const row2Tiles = buildTiles(10);
+const row1Tiles = buildTiles(12);
+const row2Tiles = buildTiles(12);
 
 export default function MarqueeSection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const row1Ref = useRef<HTMLDivElement>(null);
-  const row2Ref = useRef<HTMLDivElement>(null);
+  const [scrollOffset, setScrollOffset] = useState(0);
 
   useEffect(() => {
-    function handleScroll() {
-      const section = sectionRef.current;
-      const row1 = row1Ref.current;
-      const row2 = row2Ref.current;
-      if (!section || !row1 || !row2) return;
+    let frameId = 0;
 
-      const sectionTop = section.getBoundingClientRect().top + window.scrollY;
-      const offset = (window.scrollY - sectionTop + window.innerHeight) * 0.3;
+    const handleScroll = () => {
+      cancelAnimationFrame(frameId);
+      frameId = requestAnimationFrame(() => {
+        setScrollOffset(window.scrollY);
+      });
+    };
 
-      row1.style.transform = `translateX(${offset - 200}px)`;
-      row2.style.transform = `translateX(${-(offset - 200)}px)`;
-    }
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   return (
-    <section
-      ref={sectionRef}
-      className="bg-[#0C0C0C] pt-24 sm:pt-32 md:pt-40 pb-10 overflow-hidden"
-    >
-      <div className="flex flex-col gap-3">
-        <div ref={row1Ref} className="flex gap-3" style={{ willChange: 'transform' }}>
-          {row1Tiles.map((tile) => (
+    <section className="bg-[#0C0C0C] pt-24 sm:pt-32 md:pt-40 pb-10 overflow-hidden">
+      <div className="flex flex-col gap-3 marquee-shell">
+        <div
+          className="marquee-track marquee-track-left"
+          style={{ transform: `translate3d(${-scrollOffset * 0.28}px, 0, 0)` }}
+        >
+          {row1Tiles.map((tile, index) => (
             <video
-              key={`${tile.id}-${tile.label}`}
+              key={`${tile.id}-${index}`}
               src={tile.src}
               muted
               loop
-              autoPlay
               playsInline
               preload="metadata"
               aria-label={tile.label}
-              className="w-[420px] h-[270px] rounded-2xl object-cover flex-shrink-0"
+              className="marquee-video"
             />
           ))}
         </div>
-        <div ref={row2Ref} className="flex gap-3" style={{ willChange: 'transform' }}>
-          {row2Tiles.map((tile) => (
+        <div
+          className="marquee-track marquee-track-right"
+          style={{ transform: `translate3d(${scrollOffset * 0.22}px, 0, 0)` }}
+        >
+          {row2Tiles.map((tile, index) => (
             <video
-              key={`${tile.id}-${tile.label}`}
+              key={`${tile.id}-row2-${index}`}
               src={tile.src}
               muted
               loop
-              autoPlay
               playsInline
               preload="metadata"
               aria-label={tile.label}
-              className="w-[420px] h-[270px] rounded-2xl object-cover flex-shrink-0"
+              className="marquee-video"
             />
           ))}
         </div>
