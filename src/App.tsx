@@ -17,7 +17,7 @@ export default function App() {
       <Preloader onReady={() => setIsReady(true)} />
       <div
         className={`site-shell ${isReady ? 'site-shell-ready' : 'site-shell-hidden'}`}
-        style={{ overflowX: 'clip' }}
+        style={{ overflowX: 'visible' }}
       >
         <HeroSection />
         <MarqueeSection />

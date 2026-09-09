@@ -7,7 +7,7 @@ const NAV_LINKS = ['About', 'Price', 'Projects', 'Contact'];
 
 export default function HeroSection() {
   return (
-    <section className="relative h-screen flex flex-col" style={{ overflowX: 'clip' }}>
+    <section className="relative h-screen flex flex-col" style={{ overflowX: 'visible' }}>
       <FadeIn
         delay={0}
         y={-20}
@@ -27,8 +27,12 @@ export default function HeroSection() {
         </div>
       </FadeIn>
 
-      <FadeIn delay={0.15} y={40} className="relative z-10 overflow-hidden mt-6 sm:mt-4 md:-mt-5 px-6 md:px-10">
-        <div className="w-full max-w-6xl mx-auto text-center relative z-10 overflow-hidden">
+      <FadeIn
+        delay={0.15}
+        y={40}
+        className="relative z-10 overflow-visible mt-6 sm:mt-4 md:-mt-5 px-6 md:px-10"
+      >
+        <div className="w-full max-w-6xl mx-auto text-center relative z-10 overflow-visible pb-12">
           <DancingLetters
             text="Hi, I'm Vicki."
             className="justify-center"
@@ -38,8 +42,8 @@ export default function HeroSection() {
       </FadeIn>
 
       {/* Centered model in the middle of the hero */}
-      <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-8 sm:translate-y-10 md:translate-y-12 pointer-events-none z-30">
-        <div className="pointer-events-auto">
+      <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-8 sm:translate-y-10 md:translate-y-12 pointer-events-none z-40">
+        <div className="pointer-events-none">
           <ModelViewer />
         </div>
       </div>
