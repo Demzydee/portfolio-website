@@ -1,5 +1,31 @@
 import { useEffect, useRef } from 'react';
 
+// Type definitions for extended navigator with connection info
+interface NetworkInformation {
+  saveData?: boolean;
+  effectiveType?: '2g' | 'slow-2g' | '3g' | '4g';
+}
+
+interface ExtendedNavigator extends Navigator {
+  connection?: NetworkInformation;
+}
+
+// Type definitions for model-viewer element
+interface ModelViewerElement extends HTMLElement {
+  setAttribute(name: string, value: string): void;
+  removeAttribute(name: string): void;
+  addEventListener(
+    type: string,
+    listener: EventListener | EventListenerObject,
+    options?: boolean | AddEventListenerOptions
+  ): void;
+  removeEventListener(
+    type: string,
+    listener: EventListener | EventListenerObject,
+    options?: boolean | EventListenerOptions
+  ): void;
+}
+
 export default function ModelViewer() {
   const ref = useRef<HTMLDivElement | null>(null);
 
@@ -20,15 +46,17 @@ export default function ModelViewer() {
 
     function chooseModelSrc() {
       try {
-        const nav: any = navigator as any;
-        const saveData = nav.connection && nav.connection.saveData;
-        const effective = nav.connection && nav.connection.effectiveType;
+        const nav = navigator as ExtendedNavigator;
+        const connection = nav.connection;
+        const saveData = connection?.saveData ?? false;
+        const effectiveType = connection?.effectiveType ?? '4g';
         const w = window.innerWidth || document.documentElement.clientWidth;
-        if (saveData || effective === '2g' || effective === 'slow-2g') return '/models/realistic-head-opt.glb';
+        if (saveData || effectiveType === '2g' || effectiveType === 'slow-2g') return '/models/realistic-head-opt.glb';
         if (w <= 420) return '/models/realistic-head-opt.glb';
         if (w <= 1024) return '/models/realistic-head-mid.glb';
         return '/models/realistic-head-mid.glb';
       } catch (err) {
+        console.error('Error choosing model source:', err);
         return '/models/realistic-head-mid.glb';
       }
     }
@@ -36,7 +64,7 @@ export default function ModelViewer() {
     function createModelElement() {
       // avoid creating a second model if one already exists
       if (ref.current && ref.current.querySelector && ref.current.querySelector('model-viewer')) return;
-      const m = document.createElement('model-viewer');
+      const m = document.createElement('model-viewer') as ModelViewerElement;
       m.setAttribute('src', chooseModelSrc());
       m.setAttribute('alt', 'Vicki realistic head portrait');
       m.setAttribute('loading', 'lazy');
@@ -133,7 +161,9 @@ export default function ModelViewer() {
         if (prefersReduced) {
           try {
             m.setAttribute('camera-orbit', `${DEFAULT_YAW}deg ${DEFAULT_PHI}deg 2.2m`);
-          } catch (err) {}
+          } catch (err) {
+            console.error('Failed to set reduced motion camera orbit:', err);
+          }
           return;
         }
         const returningToDefault = Math.abs(targetYaw - DEFAULT_YAW) < 0.001 && Math.abs(targetPhi - DEFAULT_PHI) < 0.001;
@@ -143,7 +173,9 @@ export default function ModelViewer() {
         const radius = 2.2;
         try {
           m.setAttribute('camera-orbit', `${currentYaw.toFixed(2)}deg ${currentPhi.toFixed(2)}deg ${radius}m`);
-        } catch (err) {}
+        } catch (err) {
+          console.error('Failed to update model camera orbit:', err);
+        }
         raf = requestAnimationFrame(animate);
       }
 
@@ -152,7 +184,9 @@ export default function ModelViewer() {
       function setInitialOrbit() {
         try {
           m.setAttribute('camera-orbit', `${DEFAULT_YAW}deg ${DEFAULT_PHI}deg 2.2m`);
-        } catch (err) {}
+        } catch (err) {
+          console.error('Failed to set initial orbit:', err);
+        }
         currentYaw = DEFAULT_YAW;
         targetYaw = DEFAULT_YAW;
         currentPhi = DEFAULT_PHI;
@@ -163,16 +197,16 @@ export default function ModelViewer() {
 
       const container = ref.current as HTMLElement | null;
       const hero = container ? (container.closest('section') as HTMLElement | null) : null;
-      const listenTarget: EventTarget = (hero || container || window) as unknown as EventTarget;
+      const actualListenTarget = (hero || container || window) as unknown as HTMLElement;
 
-      (listenTarget as HTMLElement).addEventListener('pointermove', onPointerMove as EventListener);
-      (listenTarget as HTMLElement).addEventListener('pointerleave', () => {
+      actualListenTarget.addEventListener('pointermove', onPointerMove as EventListener);
+      actualListenTarget.addEventListener('pointerleave', () => {
         pointerYawOffset = 0;
         pointerPitchOffset = 0;
         syncTargetOrientation();
         resetInactivity();
       });
-      (listenTarget as HTMLElement).addEventListener('dblclick', onDoubleClick as EventListener);
+      actualListenTarget.addEventListener('dblclick', onDoubleClick as EventListener);
 
       setInitialOrbit();
 
@@ -217,21 +251,22 @@ export default function ModelViewer() {
           removeScroll = () => window.removeEventListener('scroll', handleScroll);
         }
       } catch (err) {
-        /* ignore */
+        console.error('Error setting up scroll animation:', err);
       }
 
       initCleanup = () => {
-        if (container) {
-          container.removeEventListener('pointermove', onPointerMove as EventListener);
-          container.removeEventListener('pointerleave', () => {});
-          container.removeEventListener('dblclick', onDoubleClick as EventListener);
-        }
+        // Remove event listeners from actual target they were added to
+        actualListenTarget.removeEventListener('pointermove', onPointerMove as EventListener);
+        actualListenTarget.removeEventListener('pointerleave', () => {});
+        actualListenTarget.removeEventListener('dblclick', onDoubleClick as EventListener);
         m.removeEventListener('pointerdown', stopClick as EventListener);
         m.removeEventListener('click', stopClick as EventListener);
         cancelAnimationFrame(raf);
         if (ref.current && m.parentElement === ref.current) ref.current.removeChild(m);
         if (removeScroll) {
-          try { removeScroll(); } catch (err) {}
+          try { removeScroll(); } catch (err) {
+            console.error('Error removing scroll listener:', err);
+          }
           removeScroll = null;
         }
       };

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { LazyMotion, domAnimation, m } from 'motion/react';
 
 interface PreloaderProps {
@@ -14,32 +14,39 @@ function getMediaType(url: string) {
 function preloadSingleAsset(src: string) {
   return new Promise<void>((resolve) => {
     const mediaType = getMediaType(src);
-    const finish = () => resolve();
+    const handleSuccess = () => resolve();
+    const handleError = (error?: Error) => {
+      console.error(`Failed to preload asset: ${src}`, error);
+      resolve(); // Still resolve to continue preloading other assets
+    };
 
     if (mediaType === 'video') {
       const asset = document.createElement('video') as HTMLVideoElement;
       asset.preload = 'auto';
       asset.muted = true;
       asset.playsInline = true;
-      asset.onloadeddata = finish;
-      asset.oncanplaythrough = finish;
-      asset.onerror = finish;
+      asset.onloadeddata = handleSuccess;
+      asset.oncanplaythrough = handleSuccess;
+      asset.onerror = () => handleError(new Error('Video load error'));
       asset.src = src;
       return;
     }
 
     const asset = new Image();
-    asset.onload = finish;
-    asset.onerror = finish;
+    asset.onload = handleSuccess;
+    asset.onerror = () => handleError(new Error('Image load error'));
     asset.src = src;
   });
 }
 
 const letters = ['V', 'i', 'c', 'k', 'i'];
 
-export default function Preloader({ onReady }: PreloaderProps) {
+export default function Preloader({ onReady: onReadyProp }: PreloaderProps) {
   const [progress, setProgress] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
+
+  // Wrap onReady in useCallback to make it stable
+  const onReady = useCallback(onReadyProp, [onReadyProp]);
 
   useEffect(() => {
     let cancelled = false;

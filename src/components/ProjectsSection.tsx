@@ -106,11 +106,13 @@ function ProjectCard({
               src={project.images[2]}
               onError={(event) => {
                 const video = event.currentTarget;
-                if (video.src !== window.location.origin + fallbackVideo) {
+                // Prevent infinite error loops by checking if we already retried
+                if (!video.dataset.errorRetried && video.src !== window.location.origin + fallbackVideo) {
+                  video.dataset.errorRetried = 'true';
                   video.src = fallbackVideo;
                 }
               }}
-              className="w-full h-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-contain bg-[#0C0C0C]"
+              className="w-full h-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-contain bg-[#0C0C0C] aspect-video"
               muted
               loop
               autoPlay
@@ -119,7 +121,7 @@ function ProjectCard({
           ) : (
             <img
               src={project.images[2]}
-              alt=""
+              alt={`${project.name} - ${project.category} project showcase`}
               className="w-full h-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-contain bg-[#0C0C0C]"
             />
           )}

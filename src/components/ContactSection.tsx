@@ -69,23 +69,30 @@ export default function ContactSection() {
             transition={{ duration: 0.7, ease: 'easeOut' }}
           >
             <div className="space-y-6">
-              {contactDetails.map((item) => (
-                <div key={item.label} className="flex items-center justify-between gap-4 border-b pb-4">
-                  <span
-                    className="uppercase tracking-[0.2em]"
-                    style={{ color: '#D7E2EA', opacity: 0.7, fontSize: '0.7rem' }}
-                  >
-                    {item.label}
-                  </span>
-                  {item.href === '#' ? (
-                    <span style={{ color: '#F5F7FA', fontSize: '1rem' }}>{item.value}</span>
-                  ) : (
-                    <a href={item.href} style={{ color: '#F5F7FA', fontSize: '1rem' }}>
-                      {item.value}
-                    </a>
-                  )}
-                </div>
-              ))}
+              {contactDetails.map((item) => {
+                const isExternalLink = item.href.startsWith('http');
+                return (
+                  <div key={item.label} className="flex items-center justify-between gap-4 border-b pb-4">
+                    <span
+                      className="uppercase tracking-[0.2em]"
+                      style={{ color: '#D7E2EA', opacity: 0.7, fontSize: '0.7rem' }}
+                    >
+                      {item.label}
+                    </span>
+                    {item.href === '#' ? (
+                      <span style={{ color: '#F5F7FA', fontSize: '1rem' }}>{item.value}</span>
+                    ) : (
+                      <a
+                        href={item.href}
+                        {...(isExternalLink ? { rel: 'noopener noreferrer', target: '_blank' } : {})}
+                        style={{ color: '#F5F7FA', fontSize: '1rem' }}
+                      >
+                        {item.value}
+                      </a>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             <div className="mt-8">
