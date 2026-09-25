@@ -1,6 +1,5 @@
-import { useRef } from 'react';
+import { CSSProperties, useRef } from 'react';
 import { motion, MotionValue, useScroll, useTransform } from 'framer-motion';
-import LiveProjectButton from './LiveProjectButton';
 
 interface Project {
   number: string;
@@ -17,7 +16,6 @@ const workVideos = [
 
 const fallbackVideo = '/videos/global_gateway_communication.mp4';
 const uploadedVideo = '/videos/work-3-uploaded.mp4';
-const uploadedImage = '/projects/work-4-speedtest.png';
 
 const projects: Project[] = [
   {
@@ -52,12 +50,12 @@ const projects: Project[] = [
   },
   {
     number: '04',
-    category: 'Case Study',
+    category: 'Personal',
     name: 'Work 4',
     images: [
-      uploadedImage,
-      uploadedImage,
-      uploadedImage,
+      workVideos[1],
+      workVideos[0],
+      workVideos[1],
     ],
   },
 ];
@@ -77,30 +75,21 @@ function ProjectCard({
   const scale = useTransform(progress, [index / total, 1], [1, targetScale]);
 
   return (
-    <div className="sticky top-24 md:top-32 h-[85vh] flex items-center" style={{ top: `${index * 28}px` }}>
+    <div className="project-stack-item" style={{ '--project-index': index } as CSSProperties}>
       <motion.div
         style={{ scale }}
-        className="w-full h-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] border-2 border-[#D7E2EA] bg-[#0C0C0C] p-4 sm:p-6 md:p-8 flex flex-col gap-6"
+        className="project-card"
       >
         <div className="flex items-center justify-between flex-wrap gap-4">
           <span
             className="font-black leading-none"
-            style={{ fontSize: 'clamp(3rem, 10vw, 140px)', color: '#D7E2EA' }}
+            style={{ fontSize: 'var(--text-number)', color: 'var(--color-text)' }}
           >
             {project.number}
           </span>
-          <div className="flex flex-col">
-            <span className="text-[#D7E2EA]/60 uppercase tracking-widest text-sm">
-              {project.category}
-            </span>
-            <span className="text-[#D7E2EA] uppercase font-medium text-2xl md:text-4xl">
-              {project.name}
-            </span>
-          </div>
-          <LiveProjectButton />
         </div>
 
-        <div className="flex-1 min-h-0">
+        <div className="project-media">
           {project.images[2].endsWith('.mp4') ? (
             <video
               src={project.images[2]}
@@ -112,7 +101,7 @@ function ProjectCard({
                   video.src = fallbackVideo;
                 }
               }}
-              className="w-full h-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-contain bg-[#0C0C0C] aspect-video"
+              className="project-video"
               muted
               loop
               autoPlay
@@ -122,7 +111,7 @@ function ProjectCard({
             <img
               src={project.images[2]}
               alt={`${project.name} - ${project.category} project showcase`}
-              className="w-full h-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-contain bg-[#0C0C0C]"
+              className="project-video"
             />
           )}
         </div>
@@ -142,16 +131,16 @@ export default function ProjectsSection() {
     <section
       id="projects"
       ref={containerRef}
-      className="bg-[#0C0C0C] rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px] -mt-10 sm:-mt-12 md:-mt-14 relative z-10 px-5 sm:px-8 md:px-10 py-20 sm:py-28"
+      className="bg-[var(--color-bg)] section-shell section-spacing relative"
     >
       <h2
-        className="hero-heading font-black uppercase leading-none tracking-tight text-center mb-16"
-        style={{ fontSize: 'clamp(3rem, 12vw, 160px)' }}
+        className="hero-heading font-black uppercase leading-none tracking-tight text-center section-heading"
+        style={{ fontSize: 'var(--text-section)' }}
       >
         Project
       </h2>
 
-      <div className="flex flex-col gap-10">
+      <div className="content-container project-stack flex flex-col">
         {projects.map((project, i) => (
           <ProjectCard
             key={project.number}

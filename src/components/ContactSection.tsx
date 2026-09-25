@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import FadeIn from './FadeIn';
 import ContactButton from './ContactButton';
 import { designSystem } from '../design-system';
@@ -11,6 +11,7 @@ const contactDetails = [
 ];
 
 export default function ContactSection() {
+  const reducedMotion = useReducedMotion();
   const sectionRef = useRef<HTMLElement | null>(null);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -25,26 +26,26 @@ export default function ContactSection() {
     <section
       ref={sectionRef}
       id="contact"
-      className="bg-[#0C0C0C] px-5 sm:px-8 md:px-10 py-20 sm:py-24 md:py-32"
+      className="bg-[var(--color-bg)] section-spacing"
     >
-      <div className="max-w-6xl mx-auto grid gap-8 lg:grid-cols-[1.2fr_0.8fr] items-center">
+      <div className="content-container grid gap-8 lg:grid-cols-[1.2fr_0.8fr] items-center">
         <FadeIn delay={0.08} y={30}>
-          <motion.div style={{ y: textY }}>
+          <motion.div style={{ y: reducedMotion ? 0 : textY }}>
             <p
               className="uppercase tracking-[0.3em] font-medium mb-6"
-              style={{ color: '#D7E2EA', opacity: 0.75, fontSize: '0.75rem' }}
+              style={{ color: 'var(--color-text)', opacity: 0.75, fontSize: 'var(--text-xs)' }}
             >
               Let&apos;s build something real
             </p>
             <h2
               className="hero-heading font-black uppercase leading-[0.9] tracking-tight mb-6 max-w-[700px]"
-              style={{ fontSize: 'clamp(2.6rem, 5vw, 6rem)' }}
+              style={{ fontSize: 'var(--text-contact)' }}
             >
               Build the boldest version of your product.
             </h2>
             <p
               className="max-w-xl leading-relaxed"
-              style={{ color: '#D7E2EA', opacity: 0.72, fontSize: 'clamp(1rem, 1.8vw, 1.35rem)' }}
+              style={{ color: 'var(--color-text)', opacity: 0.72, fontSize: 'var(--text-body)' }}
             >
               I design and build digital products that are fast, intuitive, and production-ready,
               covering everything from the interface to the infrastructure.
@@ -55,11 +56,11 @@ export default function ContactSection() {
         <FadeIn delay={0.18} y={30}>
           <motion.div
             style={{
-              y: cardY,
-              opacity: cardOpacity,
+              y: reducedMotion ? 0 : cardY,
+              opacity: reducedMotion ? 1 : cardOpacity,
               background: designSystem.gradients.panel,
               border: `1px solid ${designSystem.colors.border}`,
-              borderRadius: '32px',
+              borderRadius: 'var(--radius-lg)',
               boxShadow: designSystem.shadows.card,
             }}
             className="relative p-6 sm:p-8"
@@ -72,20 +73,20 @@ export default function ContactSection() {
               {contactDetails.map((item) => {
                 const isExternalLink = item.href.startsWith('http');
                 return (
-                  <div key={item.label} className="flex items-center justify-between gap-4 border-b pb-4">
+                  <div key={item.label} className="contact-detail">
                     <span
                       className="uppercase tracking-[0.2em]"
-                      style={{ color: '#D7E2EA', opacity: 0.7, fontSize: '0.7rem' }}
+                      style={{ color: 'var(--color-text)', opacity: 0.7, fontSize: 'var(--text-caption)' }}
                     >
                       {item.label}
                     </span>
                     {item.href === '#' ? (
-                      <span style={{ color: '#F5F7FA', fontSize: '1rem' }}>{item.value}</span>
+                      <span style={{ color: 'var(--color-text-strong)', fontSize: 'var(--text-base)' }}>{item.value}</span>
                     ) : (
                       <a
                         href={item.href}
                         {...(isExternalLink ? { rel: 'noopener noreferrer', target: '_blank' } : {})}
-                        style={{ color: '#F5F7FA', fontSize: '1rem' }}
+                        style={{ color: 'var(--color-text-strong)', fontSize: 'var(--text-base)' }}
                       >
                         {item.value}
                       </a>

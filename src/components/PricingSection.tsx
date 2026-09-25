@@ -1,6 +1,5 @@
 import FadeIn from './FadeIn';
 import ContactButton from './ContactButton';
-import { designSystem } from '../design-system';
 
 interface Plan {
   name: string;
@@ -12,20 +11,20 @@ interface Plan {
 
 const plans: Plan[] = [
   {
-    name: 'Starter',
+    name: 'Basic',
     price: '$950',
     description: 'A focused sprint for a polished landing page or feature prototype.',
     features: ['Landing page build', 'UI implementation', '2 rounds of revisions'],
   },
   {
-    name: 'Growth',
+    name: 'Standard',
     price: '$2.4k',
     description: 'For products that need a stronger frontend, better UX, and launch-ready code.',
     features: ['Full product UI', 'API integration', 'Performance optimization'],
     featured: true,
   },
   {
-    name: 'Signature',
+    name: 'Premium',
     price: '$5k+',
     description: 'Custom engineering support for product strategy, systems, and full-stack delivery.',
     features: ['Product architecture', 'Full-stack build', 'Priority collaboration'],
@@ -36,56 +35,55 @@ export default function PricingSection() {
   return (
     <section
       id="price"
-      className={`bg-white ${designSystem.radii.lg} ${designSystem.radii.xl} px-5 sm:px-8 md:px-10 py-20 sm:py-24 md:py-32`}
-      style={{ borderRadius: '40px 40px 0 0' }}
+      className="bg-white section-shell section-spacing"
     >
-      <div className="max-w-6xl mx-auto">
+      <div className="content-container">
         <FadeIn delay={0.08} y={30}>
-          <div className="mb-14 sm:mb-18 md:mb-20 text-center">
+          <div className="section-heading text-center">
             <p
               className="uppercase tracking-[0.3em] font-medium mb-4"
-              style={{ color: '#0C0C0C', opacity: 0.7, fontSize: '0.75rem' }}
+              style={{ color: 'var(--color-bg)', opacity: 0.7, fontSize: 'var(--text-xs)' }}
             >
               Pricing
             </p>
             <h2
               className="font-black uppercase tracking-tight leading-none"
-              style={{ color: '#0C0C0C', fontSize: 'clamp(3rem, 12vw, 160px)' }}
+              style={{ color: 'var(--color-bg)', fontSize: 'var(--text-section)' }}
             >
               Packages
             </h2>
           </div>
         </FadeIn>
 
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="pricing-grid">
           {plans.map((plan, index) => (
             <FadeIn key={plan.name} delay={index * 0.12} y={30}>
               <article
                 className="h-full flex flex-col p-6 sm:p-8 border"
                 style={{
-                  background: plan.featured ? '#0C0C0C' : '#F4F5F6',
-                  borderColor: plan.featured ? 'rgba(255,255,255,0.09)' : 'rgba(12,12,12,0.08)',
-                  borderRadius: '32px',
-                  boxShadow: plan.featured ? '0 30px 80px rgba(14, 14, 18, 0.35)' : 'none',
+                  background: plan.featured ? 'var(--color-bg)' : 'var(--color-surface-subtle)',
+                  borderColor: plan.featured ? 'var(--color-border-subtle)' : 'var(--color-border-subtle-dark)',
+                  borderRadius: 'var(--radius-lg)',
+                  boxShadow: plan.featured ? 'var(--shadow-featured)' : 'none',
                 }}
               >
                 <div className="mb-8">
                   <p
                     className="uppercase tracking-[0.2em] font-medium mb-4"
                     style={{
-                      color: plan.featured ? '#D7E2EA' : '#0C0C0C',
+                      color: plan.featured ? 'var(--color-text)' : 'var(--color-bg)',
                       opacity: plan.featured ? 0.7 : 0.7,
-                      fontSize: '0.7rem',
+                      fontSize: 'var(--text-caption)',
                     }}
                   >
                     {plan.name}
                   </p>
-                  <div className="flex items-end gap-2 mb-4">
+                  <div className="flex flex-wrap items-baseline gap-2 mb-4">
                     <span
                       className="font-black leading-none"
                       style={{
-                        color: plan.featured ? '#F5F7FA' : '#0C0C0C',
-                        fontSize: 'clamp(2.3rem, 6vw, 4.3rem)',
+                        color: plan.featured ? 'var(--color-text-strong)' : 'var(--color-bg)',
+                        fontSize: 'var(--text-price)',
                       }}
                     >
                       {plan.price}
@@ -93,9 +91,9 @@ export default function PricingSection() {
                     <span
                       className="uppercase tracking-wide"
                       style={{
-                        color: plan.featured ? '#D7E2EA' : '#0C0C0C',
+                        color: plan.featured ? 'var(--color-text)' : 'var(--color-bg)',
                         opacity: 0.7,
-                        fontSize: '0.75rem',
+                        fontSize: 'var(--text-xs)',
                       }}
                     >
                       starting at
@@ -104,30 +102,29 @@ export default function PricingSection() {
                   <p
                     className="leading-relaxed"
                     style={{
-                      color: plan.featured ? '#D7E2EA' : '#0C0C0C',
+                      color: plan.featured ? 'var(--color-text)' : 'var(--color-bg)',
                       opacity: 0.72,
-                      fontSize: '1rem',
+                      fontSize: 'var(--text-base)',
                     }}
                   >
                     {plan.description}
                   </p>
                 </div>
 
-                <ul className="space-y-4 mb-8">
+                <ul className="bullet-list mb-8">
                   {plan.features.map((feature) => (
                     <li
                       key={feature}
-                      className="flex items-start gap-3"
-                      style={{ color: plan.featured ? '#D7E2EA' : '#0C0C0C' }}
+                      className="bullet-list-item"
+                      style={{ color: plan.featured ? 'var(--color-text)' : 'var(--color-bg)' }}
                     >
                       <span
-                        className="inline-block rounded-full mt-1"
+                        aria-hidden="true"
+                        className="bullet-list-marker"
                         style={{
-                          width: '8px',
-                          height: '8px',
                           background: plan.featured
-                            ? 'linear-gradient(123deg, #B600A8, #BE4C00)'
-                            : '#0C0C0C',
+                            ? 'var(--gradient-feature)'
+                            : 'var(--color-bg)',
                         }}
                       />
                       <span style={{ opacity: 0.82 }}>{feature}</span>

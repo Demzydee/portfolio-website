@@ -1,4 +1,4 @@
-import { LazyMotion, domAnimation, m } from "motion/react";
+import { LazyMotion, domAnimation, m, useReducedMotion } from "motion/react";
 import { useState, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
@@ -6,6 +6,8 @@ interface DancingLettersProps {
   text?: string;
   className?: string;
   letterClassName?: string;
+  appearance?: "gradient" | "inherit";
+  animateOnActivate?: boolean;
   autoPlay?: boolean;
   autoPlayInterval?: number;
 }
@@ -95,7 +97,10 @@ const DancingLetters = ({
   text = "ANIMATE",
   className = "",
   letterClassName = "",
+  appearance = "gradient",
+  animateOnActivate = false,
 }: DancingLettersProps) => {
+  const reducedMotion = useReducedMotion();
   const [activeIndices, setActiveIndices] = useState<Set<number>>(new Set());
   const letters = text.split("");
   const [isLoaded, setIsLoaded] = useState(false);
@@ -104,6 +109,12 @@ const DancingLetters = ({
     const timer = setTimeout(() => setIsLoaded(true), 100);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (animateOnActivate && !reducedMotion) {
+      setActiveIndices(new Set(text.split("").map((_, index) => index)));
+    }
+  }, [animateOnActivate, reducedMotion, text]);
 
   const handleClick = useCallback((index: number) => {
     setActiveIndices((prev) => {
@@ -131,9 +142,15 @@ const DancingLetters = ({
     });
   }, []);
 
+  if (reducedMotion) return (
+    <span className={cn("flex items-center justify-center", className)}>
+      {letters.map((letter, index) => <span key={index} className={cn(appearance === "gradient" && "hero-heading font-black", letterClassName)}>{letter === " " ? "\u00A0" : letter}</span>)}
+    </span>
+  );
+
   return (
     <LazyMotion features={domAnimation}>
-      <m.div
+      <m.span
         className={cn("flex items-center justify-center select-none", className)}
         style={{ perspective: "1000px" }}
         initial="hidden"
@@ -158,6 +175,7 @@ const DancingLetters = ({
           return (
             <m.span
               key={`${letter}-${id}`}
+              data-text={letter}
               variants={{
                 hidden: { opacity: 0, y: 20, scale: 0.8 },
                 visible: {
@@ -188,8 +206,8 @@ const DancingLetters = ({
                 if (definition === "active") handleAnimationComplete(id);
               }}
               className={cn(
-                "relative inline-block cursor-pointer text-[14vw] font-black uppercase tracking-[-0.06em] text-transparent md:text-[16vw] lg:text-[17.5vw]",
-                "bg-gradient-to-b from-[#646973] via-[#d7e2ea] to-[#bbccd7] bg-clip-text",
+                "relative inline-block cursor-pointer",
+                appearance === "gradient" && "text-[14vw] font-black uppercase tracking-[-0.06em] text-transparent md:text-[16vw] lg:text-[17.5vw] bg-gradient-to-b from-[#646973] via-[#d7e2ea] to-[#bbccd7] bg-clip-text",
                 letterClassName,
                 isActive ? "z-10" : "z-0"
               )}
@@ -203,7 +221,7 @@ const DancingLetters = ({
             </m.span>
           );
         })}
-      </m.div>
+      </m.span>
     </LazyMotion>
   );
 };

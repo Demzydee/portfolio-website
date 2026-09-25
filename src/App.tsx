@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import HeroSection from './components/HeroSection';
 import MarqueeSection from './components/MarqueeSection';
 import AboutSection from './components/AboutSection';
@@ -12,13 +12,15 @@ import Preloader from './components/Preloader';
 export default function App() {
   const [isReady, setIsReady] = useState(false);
 
+  const handleReady = useCallback(() => setIsReady(true), []);
+
   return (
     <>
-      <Preloader onReady={() => setIsReady(true)} />
+      <Preloader onReady={handleReady} />
       <div
         className={`site-shell ${isReady ? 'site-shell-ready' : 'site-shell-hidden'}`}
-        style={{ overflowX: 'visible' }}
       >
+        <main id="main-content">
         <HeroSection />
         <MarqueeSection />
         <AboutSection />
@@ -26,6 +28,7 @@ export default function App() {
         <ProjectsSection />
         <PricingSection />
         <ContactSection />
+        </main>
         <Footer />
       </div>
     </>

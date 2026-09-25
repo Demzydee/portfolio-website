@@ -42,7 +42,7 @@ export default function MarqueeSection() {
   }, []);
 
   return (
-    <section className="bg-[#0C0C0C] pt-24 sm:pt-32 md:pt-40 pb-10 overflow-hidden">
+    <section className="work-marquee bg-[var(--color-bg)] overflow-hidden">
       <div className="flex flex-col gap-3 marquee-shell">
         <div
           className="marquee-track marquee-track-left"

@@ -50,6 +50,13 @@ export default function Preloader({ onReady: onReadyProp }: PreloaderProps) {
 
   useEffect(() => {
     let cancelled = false;
+    let finishTimer: ReturnType<typeof setTimeout>;
+    // Slow or unavailable media must never block access to the portfolio.
+    const deadline = setTimeout(() => {
+      cancelled = true;
+      setIsVisible(false);
+      onReady();
+    }, 4000);
 
     const preloadAll = async () => {
       const mediaNodes = Array.from(document.querySelectorAll('img, video, source'));
@@ -90,7 +97,8 @@ export default function Preloader({ onReady: onReadyProp }: PreloaderProps) {
 
       if (!cancelled) {
         setProgress(100);
-        setTimeout(() => {
+        finishTimer = setTimeout(() => {
+          clearTimeout(deadline);
           setIsVisible(false);
           onReady();
         }, 450);
@@ -101,6 +109,8 @@ export default function Preloader({ onReady: onReadyProp }: PreloaderProps) {
 
     return () => {
       cancelled = true;
+      clearTimeout(deadline);
+      clearTimeout(finishTimer);
     };
   }, [onReady]);
 

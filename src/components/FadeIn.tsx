@@ -1,4 +1,4 @@
-import { motion, Variants } from 'framer-motion';
+import { motion, Variants, useReducedMotion } from 'framer-motion';
 import { ElementType, ReactNode } from 'react';
 
 interface FadeInProps {
@@ -20,10 +20,11 @@ export default function FadeIn({
   as = 'div',
   className,
 }: FadeInProps) {
+  const reducedMotion = useReducedMotion();
   const MotionTag = motion.create(as as any);
 
   const variants: Variants = {
-    hidden: { opacity: 0, x, y },
+    hidden: { opacity: reducedMotion ? 1 : 0, x: reducedMotion ? 0 : x, y: reducedMotion ? 0 : y },
     visible: {
       opacity: 1,
       x: 0,

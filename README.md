@@ -20,3 +20,7 @@ Then open the printed local URL (usually http://localhost:5173).
 - Bio copy in `AboutSection.tsx` and service descriptions in
   `ServicesSection.tsx` are placeholder text — swap in your own.
 - Build for production with `npm run build`.
+
+## Design system
+
+See [the design system guide](docs/DESIGN_SYSTEM.md) before changing visuals or layouts. Canonical tokens live in `src/styles/tokens.css`; React aliases live in `src/design-system.ts`.

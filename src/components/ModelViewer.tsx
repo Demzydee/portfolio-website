@@ -71,8 +71,8 @@ export default function ModelViewer() {
       m.setAttribute('reveal', 'auto');
       m.setAttribute('shadow-intensity', '0.0');
       m.style.background = 'transparent';
-      m.style.width = 'min(46vw, 640px)';
-      m.style.height = 'min(46vw, 640px)';
+      m.style.width = '100%';
+      m.style.height = '100%';
       m.style.maxWidth = '100%';
       m.style.maxHeight = '100%';
       m.style.display = 'block';
@@ -200,12 +200,13 @@ export default function ModelViewer() {
       const actualListenTarget = (hero || container || window) as unknown as HTMLElement;
 
       actualListenTarget.addEventListener('pointermove', onPointerMove as EventListener);
-      actualListenTarget.addEventListener('pointerleave', () => {
+      const onPointerLeave = () => {
         pointerYawOffset = 0;
         pointerPitchOffset = 0;
         syncTargetOrientation();
         resetInactivity();
-      });
+      };
+      actualListenTarget.addEventListener('pointerleave', onPointerLeave);
       actualListenTarget.addEventListener('dblclick', onDoubleClick as EventListener);
 
       setInitialOrbit();
@@ -257,7 +258,8 @@ export default function ModelViewer() {
       initCleanup = () => {
         // Remove event listeners from actual target they were added to
         actualListenTarget.removeEventListener('pointermove', onPointerMove as EventListener);
-        actualListenTarget.removeEventListener('pointerleave', () => {});
+        actualListenTarget.removeEventListener('pointerleave', onPointerLeave);
+        if (inactivityTimer) clearTimeout(inactivityTimer);
         actualListenTarget.removeEventListener('dblclick', onDoubleClick as EventListener);
         m.removeEventListener('pointerdown', stopClick as EventListener);
         m.removeEventListener('click', stopClick as EventListener);
@@ -300,5 +302,5 @@ export default function ModelViewer() {
     };
   }, []);
 
-  return <div ref={ref} />;
+  return <div className="model-viewer-frame" ref={ref} />;
 }
