@@ -307,3 +307,11 @@ h2 { line-height: var(--leading-display); overflow-wrap: anywhere; }
   .signature-pixels, .signature-letter::before, .signature-letter::after { display: none; }
   .signature-name { transition: none; }
 }
+
+/* Give the desktop artwork and copy their own breathing room. */
+@media (min-width: 64rem) {
+  .about-section { padding-block: var(--about-desktop-padding); }
+  .about-art-layout { max-width: var(--about-desktop-width); row-gap: var(--about-desktop-row-gap); column-gap: var(--about-desktop-column-gap); }
+  .about-details { gap: var(--about-desktop-action-gap); }
+  .about-art-smile, .about-art-cursor { align-self: end; }
+}

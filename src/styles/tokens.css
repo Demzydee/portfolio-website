@@ -66,6 +66,11 @@
   --section-heading-gap: clamp(2rem, 4vw, 4rem);
   --about-art-size: clamp(6rem, 14vw, 12rem);
   --about-art-mobile-size: clamp(4rem, 18vw, 6rem);
+  --about-desktop-width: 96rem;
+  --about-desktop-padding: clamp(6rem, 9vw, 10rem);
+  --about-desktop-row-gap: clamp(4rem, 7vw, 7rem);
+  --about-desktop-column-gap: clamp(2rem, 4vw, 4rem);
+  --about-desktop-action-gap: clamp(3rem, 4vw, 4rem);
   --about-art-duration: 7s;
   --about-content-gap: clamp(1.5rem, 3vw, 2.5rem);
   --marquee-space-top: clamp(1.5rem, 4vw, 4rem);
@@ -124,7 +129,7 @@
   --footer-particle-area: 90;
   --footer-particle-limit: 14000;
   --footer-particle-speed: 36;
-  --footer-particle-fade-travel: .7;
+  --footer-particle-fade-travel: 1.183;
   --footer-glitch-color: var(--color-button-end);
   --footer-glitch-duration: 650ms;
   --footer-height: clamp(17rem, 27vw, 36rem);

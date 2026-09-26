@@ -41,7 +41,7 @@ function RisingPixels({ active }: { active: boolean }) {
       context.fillStyle = fieldColor;
       for (const pixel of pixels) {
         const y = ((pixel.y - travel * pixel.speed) % height + height) % height;
-        // Fade through the lower 70% of the name container, not the footer.
+        // Fade through the token-defined portion of the name container, not the footer.
         const remaining = Math.min(1, Math.max(0, (y - fadeEnd) / Math.max(1, fadeStart - fadeEnd)));
         const opacity = remaining * remaining * (3 - 2 * remaining);
         if (opacity === 0) continue;
