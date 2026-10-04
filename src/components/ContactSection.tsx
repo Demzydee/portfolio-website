@@ -5,7 +5,7 @@ import ContactButton from './ContactButton';
 import { designSystem } from '../design-system';
 
 const contactDetails = [
-  { label: 'Email', value: 'hello@vicki.studio', href: 'mailto:hello@vicki.studio' },
+  { label: 'Email', value: 'ademolavictor290@gmail.com', href: 'mailto:ademolavictor290@gmail.com' },
   { label: 'Instagram', value: '@vicki.studio', href: 'https://instagram.com' },
   { label: 'Location', value: 'Remote worldwide', href: '#' },
 ];

@@ -8,6 +8,6 @@ export default function ContactButton({ onClick, className = '' }: ContactButton
   return onClick ? (
     <button type="button" onClick={onClick} className={classes}>Contact Me</button>
   ) : (
-    <a href="mailto:hello@vicki.studio" className={classes}>Contact Me</a>
+    <a href="mailto:ademolavictor290@gmail.com" className={classes}>Contact Me</a>
   );
 }
